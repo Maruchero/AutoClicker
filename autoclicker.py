@@ -6,7 +6,12 @@ from time import sleep
 
 # Functions
 def on_press(key):
+    global click, run
     if key == toggle_key:
+        click = True
+        return False
+    elif key == keyboard.Key.esc:
+        run = False
         return False
 
 
@@ -17,44 +22,63 @@ def set_toggle_key(key):
 
 
 # Globals
-frequency = 10  # clicks per second
+__author__ = "Under3nder"
+
+mouse = Controller()
+RETARD = 0.01  # instruction retard
+
 toggle_key = keyboard.Key.f6  # key to press to start/stop clicking
 
 # START
-__author__ = "Under3nder"
-print(f"Autoclicker by {__author__}")
+print(f"Auto clicker by {__author__}")
 
+# Change toggle key
+print("#########################")
 change_mode = input(f"The toggle key is set to '{toggle_key}'. Do you want to change it?[y/n] ")
 while change_mode != 'y' and change_mode != 'n':
     change_mode = input(f"The toggle key is set to '{toggle_key}'. Do you want to change it?[y/n] ")
 
 if change_mode == 'y':
-    sleep(0.6)
+    sleep(0.3)
     print("Press the key you want to set...")
     with keyboard.Listener(on_release=set_toggle_key) as _listener:
         _listener.join()
     print(f"\nThe key is now set to {toggle_key}")
 
-mouse = Controller()
+# Set clicks per second
+print("\n#########################")
+cps = input("Enter CPS(default is 10): ")
+try:
+    cps = int(cps)
+except ValueError:
+    cps = 10
 
-RETARD = 0.045  # instruction retard
-
-print(f"\n### To start the autoclicker press '{toggle_key}'")
-with keyboard.Listener(on_release=on_press) as listener:
-    listener.join()
-
-print(f"### START CLICKING ###")
+# Clicking
+print("\n#########################")
+print(f"To start the auto clicker press '{toggle_key}'")
+print("Press 'Key.esc' to close auto clicker")
 run = True
+click = True
 while run:
-    mouse.click(Button.left, 1)
-    with keyboard.Events() as events:
-        event = events.get(1/frequency - RETARD)
-        try:
-            if event.key == toggle_key:
-                run = False
-            elif event.key == keyboard.Key.esc:
-                quit()
-        except AttributeError:
-            pass
-    
-print("### FINISH CLICKING ###")
+    with keyboard.Listener(on_release=on_press) as listener:
+        listener.join()
+    if not run:
+        continue
+
+    print("Start clicking")
+    while click:
+        # click
+        mouse.click(Button.left, 1)
+        # check stop keys
+        with keyboard.Events() as events:
+            event = events.get(1 / cps - RETARD)
+            try:
+                if event.key == toggle_key:
+                    click = False
+                elif event.key == keyboard.Key.esc:
+                    click = False
+                    run = False
+            except AttributeError:
+                pass
+    print("Finish clicking\n")
+    sleep(0.3)
