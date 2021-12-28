@@ -7,7 +7,7 @@ from time import sleep
 # Functions
 def on_press(key):
     global click, run
-    if key == toggle_key:
+    if str(key) == toggle_key:
         click = True
         return False
     elif key == keyboard.Key.esc:
@@ -27,7 +27,18 @@ __author__ = "Under3nder"
 mouse = Controller()
 RETARD = 0.01  # instruction retard
 
-toggle_key = keyboard.Key.f6  # key to press to start/stop clicking
+# Read Config
+# configuration = {"toggle_key": keyboard.Key.f6, "cps": 10}
+try:
+    config = open("config.txt", 'r')
+
+    toggle_key = config.readline()[:-1]
+    cps = int(config.readline())
+
+    config.close()
+except FileNotFoundError:
+    toggle_key = keyboard.Key.f6
+    cps = 10
 
 # START
 print(f"Auto clicker by {__author__}")
@@ -47,11 +58,18 @@ if change_mode == 'y':
 
 # Set clicks per second
 print("\n#########################")
-cps = input("Enter CPS(default is 10): ")
+_cps = input(f"Enter CPS(actually is {cps}): ")
 try:
-    cps = int(cps)
+    cps = int(_cps)
 except ValueError:
-    cps = 10
+    pass
+print(f"CPS = {cps}")
+
+# Write Config
+config = open("config.txt", 'w')
+config.write(str(toggle_key) + '\n')
+config.write(str(cps))
+config.close()
 
 # Clicking
 print("\n#########################")
@@ -73,7 +91,7 @@ while run:
         with keyboard.Events() as events:
             event = events.get(1 / cps - RETARD)
             try:
-                if event.key == toggle_key:
+                if str(event.key) == toggle_key:
                     click = False
                 elif event.key == keyboard.Key.esc:
                     click = False

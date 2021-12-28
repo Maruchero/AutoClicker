@@ -1,6 +1,7 @@
 # dev
 dev/
 dev_folder_maker.py
+config.txt
 
-#
+# hidden
 .*
