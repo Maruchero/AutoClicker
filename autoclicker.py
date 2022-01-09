@@ -83,7 +83,7 @@ while run:
     if not run:
         continue
 
-    print("Start clicking")
+    print("START clicking")
     while click:
         # click
         mouse.click(Button.left, 1)
@@ -98,5 +98,5 @@ while run:
                     run = False
             except AttributeError:
                 pass
-    print("Finish clicking\n")
+    print("STOP clicking\n")
     sleep(0.3)
